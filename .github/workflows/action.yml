@@ -2,8 +2,8 @@ name: Deploy to Azure Spring Cloud with Key Vault
 on: [push]
 
 env:
-  RESOURCE_GROUP: petclinic-demo
-  SPRING_CLOUD_SERVICE: petclinic-demo
+  RESOURCE_GROUP: petclinic-demo # customize this
+  SPRING_CLOUD_SERVICE: petclinic-demo # customize this
   # ==== APPS ====:  
   API_GATEWAY: api-gateway
   ADMIN_SERVER: admin-server
