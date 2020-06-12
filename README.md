@@ -354,6 +354,25 @@ Finally, edit the workfolw file `.github/workflows/action.yml` in your forked re
 After you commited this change, you will see GitHub Actions triggered to build and deploy all the apps in the repo to your Azure Spring Cloud instance.
 ![](./media/automate-deployments-using-github-actions.jpg)
 
+## Reconfigure the microservices to use Azure KeyVault to get the database configuration
+
+If you want to use Azure KeyVault to get the database configuration you need
+to take the following steps:
+
+1. Create an Azure KeyVault
+1. Add the DB secrets to the KeyVault
+1. Create a managed identity for your Spring Boot application on Azure Spring Cloud.
+1. Add an access policy to Azure KeyVault to allow the managed identity access.
+1. Redploy the microservice with the `keyvault` profile (see below for an example).
+
+```bash
+
+  az spring-cloud app deploy --name ${VISITS_SERVICE} \
+        --jar-path ${VISITS_SERVICE_JAR} \
+        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=keyvault' \
+        --env AZURE_KEY_VAULT_URI=URI_TO_YOUR_KEYVAULT
+```
+
 ## Next Steps
 
 In this quickstart, you've deployed an existing Spring microservices app using Azure CLI, Terraform and GitHub Actions. To learn more about Azure Spring Cloud, go to:
