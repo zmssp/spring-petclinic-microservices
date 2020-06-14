@@ -373,10 +373,14 @@ If you skipped the [Automation step](#automate-deployments-using-github-actions)
 Store database connection secrets in Key Vault.
 
 ```bash
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-FULL-NAME" --value ${MYSQL_SERVER_FULL_NAME}
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-DATABASE-NAME" --value ${MYSQL_DATABASE_NAME}
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-ADMIN-LOGIN-NAME" --value ${MYSQL_SERVER_ADMIN_LOGIN_NAME}
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-ADMIN-PASSWORD" --value ${MYSQL_SERVER_ADMIN_PASSWORD}
+    az keyvault secret set --vault-name ${KEY_VAULT} \
+        --name "MYSQL-SERVER-FULL-NAME" --value ${MYSQL_SERVER_FULL_NAME}
+    az keyvault secret set --vault-name ${KEY_VAULT} \
+        --name "MYSQL-DATABASE-NAME" --value ${MYSQL_DATABASE_NAME}
+    az keyvault secret set --vault-name ${KEY_VAULT} \
+        --name "MYSQL-SERVER-ADMIN-LOGIN-NAME" --value ${MYSQL_SERVER_ADMIN_LOGIN_NAME}
+    az keyvault secret set --vault-name ${KEY_VAULT} \
+        --name "MYSQL-SERVER-ADMIN-PASSWORD" --value ${MYSQL_SERVER_ADMIN_PASSWORD}
 ```                      
 
 ### Enable Managed Identities for applications in Azure Spring Cloud
@@ -399,9 +403,12 @@ Enable System Assigned Identities for applications and export identities to envi
 Add an access policy to Azure Key Vault to allow Managed Identities to read secrets.
 
 ```bash
-    az keyvault set-policy --name ${KEY_VAULT} --object-id ${CUSTOMERS_SERVICE_IDENTITY} --secret-permissions get list
-    az keyvault set-policy --name ${KEY_VAULT} --object-id ${VETS_SERVICE_IDENTITY} --secret-permissions get list
-    az keyvault set-policy --name ${KEY_VAULT} --object-id ${VISITS_SERVICE_IDENTITY} --secret-permissions get list
+    az keyvault set-policy --name ${KEY_VAULT} \
+        --object-id ${CUSTOMERS_SERVICE_IDENTITY} --secret-permissions get list
+    az keyvault set-policy --name ${KEY_VAULT} \
+        --object-id ${VETS_SERVICE_IDENTITY} --secret-permissions get list
+    az keyvault set-policy --name ${KEY_VAULT} \
+        --object-id ${VISITS_SERVICE_IDENTITY} --secret-permissions get list
 ```
 
 ### Activate applications to load secrets from Azure Key Vault
