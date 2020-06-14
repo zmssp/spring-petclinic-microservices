@@ -23,6 +23,8 @@ You will:
 - Deploy applications to Azure
 - Bind applications to Azure Database for MySQL
 - Open the application
+- Automate deployments using GitHub Actions
+- Manage application secrets using Azure KeyVault
 
 ## What you will need
 
@@ -121,6 +123,7 @@ Create an instance of Azure Spring Cloud.
 
 ```bash
     az spring-cloud create --name ${SPRING_CLOUD_SERVICE} \
+        --sku standard \
         --resource-group ${RESOURCE_GROUP} \
         --location ${REGION}
 ```
@@ -295,7 +298,7 @@ Navigate to the URL provided by the previous command to open the Pet Clinic micr
     
 ![](./media/petclinic.jpg)
 
-## Automate Deployments using GitHub Actions
+## Automate deployments using GitHub Actions
 
 ### Prepare secrets in your Key Vault
 If you do not have a Key Vault yet, run the following commands to provision a Key Vault:
@@ -306,10 +309,10 @@ If you do not have a Key Vault yet, run the following commands to provision a Ke
 
 Add the MySQL secrets to your Key Vault:
 ```bash
+    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-FULL-NAME" --value ${MYSQL_SERVER_FULL_NAME}
     az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-DATABASE-NAME" --value ${MYSQL_DATABASE_NAME}
     az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-ADMIN-LOGIN-NAME" --value ${MYSQL_SERVER_ADMIN_LOGIN_NAME}
     az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-ADMIN-PASSWORD" --value ${MYSQL_SERVER_ADMIN_PASSWORD}
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-FULL-NAME" --value ${MYSQL_SERVER_FULL_NAME}
 ```
 
 Create a service principal with enough scope/role to manage your Azure Spring Cloud instance:
@@ -335,7 +338,7 @@ Add them as secrets to your Key Vault:
     az keyvault secret set --vault-name ${KEY_VAULT} --name "AZURE-CREDENTIALS-FOR-SPRING" --value "<results above>"
 ```
 
-### Grant Access to Key Vault with Service Principal
+### Grant access to Key Vault with Service Principal
 To generate a key to access the Key Vault, execute command below:
 ```bash
     az ad sp create-for-rbac --role contributor --scopes /subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP>/providers/Microsoft.KeyVault/vaults/<KEY_VAULT> --sdk-auth
@@ -354,23 +357,69 @@ Finally, edit the workfolw file `.github/workflows/action.yml` in your forked re
 After you commited this change, you will see GitHub Actions triggered to build and deploy all the apps in the repo to your Azure Spring Cloud instance.
 ![](./media/automate-deployments-using-github-actions.jpg)
 
-## Reconfigure the microservices to use Azure KeyVault to get the database configuration
+## Manage application secrets using Azure KeyVault
 
-If you want to use Azure KeyVault to get the database configuration you need
-to take the following steps:
+Use Azure Key Vault to store and load secrets to connect to MySQL database.
 
-1. Create an Azure KeyVault
-1. Add the DB secrets to the KeyVault
-1. Create a managed identity for your Spring Boot application on Azure Spring Cloud.
-1. Add an access policy to Azure KeyVault to allow the managed identity access.
-1. Redploy the microservice with the `keyvault` profile (see below for an example).
+### Create Azure Key Vault and store secrets
+
+If you skipped the [Automation step](#automate-deployments-using-github-actions), create an Azure Key Vault and store database connection secrets.
 
 ```bash
+    az keyvault create --name ${KEY_VAULT} -g ${RESOURCE_GROUP}
+    export KEY_VAULT_URI=$(az keyvault show --name ${KEY_VAULT} | jq -r '.properties.vaultUri')
+```
 
-  az spring-cloud app deploy --name ${VISITS_SERVICE} \
-        --jar-path ${VISITS_SERVICE_JAR} \
-        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=keyvault' \
-        --env AZURE_KEY_VAULT_URI=URI_TO_YOUR_KEYVAULT
+Store database connection secrets in Key Vault.
+
+```bash
+    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-FULL-NAME" --value ${MYSQL_SERVER_FULL_NAME}
+    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-DATABASE-NAME" --value ${MYSQL_DATABASE_NAME}
+    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-ADMIN-LOGIN-NAME" --value ${MYSQL_SERVER_ADMIN_LOGIN_NAME}
+    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-ADMIN-PASSWORD" --value ${MYSQL_SERVER_ADMIN_PASSWORD}
+```                      
+
+### Enable Managed Identities for applications in Azure Spring Cloud
+
+Enable System Assigned Identities for applications and export identities to environment.
+
+```bash
+    az spring-cloud app identity assign --name ${CUSTOMERS_SERVICE}
+    export CUSTOMERS_SERVICE_IDENTITY=$(az spring-cloud app show --name ${CUSTOMERS_SERVICE} | jq -r '.identity.principalId')
+    
+    az spring-cloud app identity assign --name ${VETS_SERVICE}
+    export VETS_SERVICE_IDENTITY=$(az spring-cloud app show --name ${VETS_SERVICE} | jq -r '.identity.principalId')
+    
+    az spring-cloud app identity assign --name ${VISITS_SERVICE}
+    export VISITS_SERVICE_IDENTITY=$(az spring-cloud app show --name ${VISITS_SERVICE} | jq -r '.identity.principalId')
+```
+
+### Grant Managed Identities with access to Azure Key Vault
+
+Add an access policy to Azure Key Vault to allow Managed Identities to read secrets.
+
+```bash
+    az keyvault set-policy --name ${KEY_VAULT} --object-id ${CUSTOMERS_SERVICE_IDENTITY} --secret-permissions get list
+    az keyvault set-policy --name ${KEY_VAULT} --object-id ${VETS_SERVICE_IDENTITY} --secret-permissions get list
+    az keyvault set-policy --name ${KEY_VAULT} --object-id ${VISITS_SERVICE_IDENTITY} --secret-permissions get list
+```
+
+### Activate applications to load secrets from Azure Key Vault
+
+Activate applications to load secrets from Azure Key Vault.
+
+```bash
+    az spring-cloud app update --name ${CUSTOMERS_SERVICE} \
+        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=mysql,key-vault' \
+        --env AZURE_KEY_VAULT_URI=${KEY_VAULT_URI}
+        
+    az spring-cloud app update --name ${VETS_SERVICE} \
+        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=mysql,key-vault' \
+        --env AZURE_KEY_VAULT_URI=${KEY_VAULT_URI} 
+            
+    az spring-cloud app update --name ${VISITS_SERVICE} \
+        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=mysql,key-vault' \
+        --env AZURE_KEY_VAULT_URI=${KEY_VAULT_URI}  
 ```
 
 ## Next Steps

@@ -27,3 +27,6 @@ export MYSQL_SERVER_ADMIN_NAME=admin-name # customize this
 export MYSQL_SERVER_ADMIN_LOGIN_NAME=${MYSQL_SERVER_ADMIN_NAME}\@${MYSQL_SERVER_NAME}
 export MYSQL_SERVER_ADMIN_PASSWORD=SuperS3cr3t # customize this
 export MYSQL_DATABASE_NAME=petclinic
+
+# ==== KEY VAULT Info ====
+export KEY_VAULT=your-keyvault-name # customize this
