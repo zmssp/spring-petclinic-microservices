@@ -421,17 +421,20 @@ Add an access policy to Azure Key Vault to allow Managed Identities to read secr
 Activate applications to load secrets from Azure Key Vault.
 
 ```bash
+    # DO NOT FORGET to replace the value of "azure.keyvault.uri" with your Key Vault URI
     az spring-cloud app update --name ${CUSTOMERS_SERVICE} \
-        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=mysql,key-vault' \
-        --env AZURE_KEY_VAULT_URI=${KEY_VAULT_URI}
-        
+        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=mysql,key-vault -Dazure.keyvault.uri=https://petclinic-keyvault.vault.azure.net/' \
+        --env
+    
+    # DO NOT FORGET to replace the value of "azure.keyvault.uri" with your Key Vault URI    
     az spring-cloud app update --name ${VETS_SERVICE} \
-        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=mysql,key-vault' \
-        --env AZURE_KEY_VAULT_URI=${KEY_VAULT_URI} 
-            
+        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=mysql,key-vault -Dazure.keyvault.uri=https://petclinic-keyvault.vault.azure.net/' \
+        --env
+    
+    # DO NOT FORGET to replace the value for "azure.keyvault.uri" JVM startup parameter with your Key Vault URI       
     az spring-cloud app update --name ${VISITS_SERVICE} \
-        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=mysql,key-vault' \
-        --env AZURE_KEY_VAULT_URI=${KEY_VAULT_URI}  
+        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=mysql,key-vault -Dazure.keyvault.uri=https://petclinic-keyvault.vault.azure.net/' \
+        --env
 ```
 
 ## Next Steps
