@@ -15,23 +15,6 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-  
-- task: DownloadSecureFile@1
-  name: settings_xml
-  displayName: 'Download Maven Settings'
-  inputs:
-    secureFile: 'settings.xml'
-
-- task: Bash@3
-  name: copy_maven_settings
-  displayName: Transferring Maven settings to repository root
-  inputs:
-    targetType: 'inline'
-    script: |
-      echo 'Copying $(settings_xml.secureFilePath)'
-      mkdir ~/.m2
-      cp -v -f $(settings_xml.secureFilePath) ~/.m2
-      echo Build Number: '$(Build.BuildId)'
 
 - task: Maven@3
   inputs:
