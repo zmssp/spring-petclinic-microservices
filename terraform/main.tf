@@ -6,41 +6,47 @@ variable "resource_group" {
     type = string
 }
 variable "region" {
-    type = string
+  type    = string
+  default = "West US 2"
 }
 variable "spring_cloud_service" {
-    type = string
+  type    = string
 }
 variable "api_gateway" {
-    type = string
+  type    = string
+  default = "api-gateway"
 }
 variable "admin_server" {
-    type = string
+  type    = string
+  default = "admin-server"
 }
 variable "customers_service" {
-    type = string
+  type    = string
+  default = "customers-service"
 }
 variable "visits_service" {
-    type = string
+  type    = string
+  default = "visits-service"
 }
 variable "vets_service" {
-    type = string
-}
-variable "mysql_server_name" {
-    type = string
+  type    = string
+  default = "vets-service"
 }
 variable "mysql_server_admin_name" {
-    type = string
+  type    = string
+  default = "sqlAdmin"
 }
 variable "mysql_server_admin_password" {
-    type = string
+  type    = string
 }
 variable "mysql_database_name" {
-    type = string
+  type    = string
+  default = "petclinic"
 }
-variable "dev_machine_ip" {
-    type = string
+locals {
+  mysql_server_name  = "pcsms-db-${var.resource_group}"
 }
+
 
 resource "azurerm_resource_group" "example" {
   name     = var.resource_group
@@ -97,7 +103,7 @@ resource "azurerm_spring_cloud_app" "visits_service" {
 
 
 resource "azurerm_mysql_server" "example" {
-  name                = var.mysql_server_name
+  name                = local.mysql_server_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -129,14 +135,6 @@ resource "azurerm_mysql_firewall_rule" "allazureips" {
   end_ip_address      = "0.0.0.0"
 }
 
-
-resource "azurerm_mysql_firewall_rule" "devMachine" {
-  name                = "devMachine"
-  resource_group_name = azurerm_resource_group.example.name
-  server_name         = azurerm_mysql_server.example.name
-  start_ip_address    = var.dev_machine_ip
-  end_ip_address      = var.dev_machine_ip
-}
 
 resource "azurerm_mysql_configuration" "example" {
   name                = "interactive_timeout"
