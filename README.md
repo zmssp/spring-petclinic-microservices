@@ -123,7 +123,7 @@ Create an instance of Azure Spring Cloud.
 
 ```bash
     az spring-cloud create --name ${SPRING_CLOUD_SERVICE} \
-        --sku standard \
+        --sku standard --enable-java-agent \
         --resource-group ${RESOURCE_GROUP} \
         --location ${REGION}
 ```
