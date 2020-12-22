@@ -349,6 +349,10 @@ All those three REST controllers `OwnerResource`, `PetResource` and `VisitResour
 You can see these custom metrics in the `Metrics` blade:
 ![](./media/petclinic-microservices-custom-metrics.jpg)
 
+You can use the Availability Test feature in Application Insights and monitor 
+the availability of applications:
+![](./media/petclinic-microservices-availability.jpg)
+
 Navigate to the `Live Metrics` blade - you can see live metrics on screen with low latencies < 1 second:
 ![](./media/petclinic-microservices-live-metrics.jpg)
 
