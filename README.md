@@ -23,6 +23,7 @@ You will:
 - Deploy applications to Azure
 - Bind applications to Azure Database for MySQL
 - Open the application
+- Monitor applications
 - Automate deployments using GitHub Actions
 - Manage application secrets using Azure KeyVault
 
@@ -304,6 +305,52 @@ Deploy microservice applications to Azure.
 Navigate to the URL provided by the previous command to open the Pet Clinic microservice application.
     
 ![](./media/petclinic.jpg)
+
+## Monitor microservice applications
+
+Open the Application Insights created by Azure Spring Cloud and start monitoring microservice applications.
+
+Navigate to the `Application Map` blade:
+![](./media/distributed-tracking-new-ai-agent.jpg)
+
+Navigate to the `Performance` blade:
+![](./media/petclinic-microservices-performance.jpg)
+
+Navigate to the `Performance/Dependenices` blade - you can see the performance number for dependencies, 
+particularly SQL calls:
+![](./media/petclinic-microservices-insights-on-dependencies.jpg)
+
+Click on a SQL call to see the end-to-end transaction in context:
+![](./media/petclinic-microservices-end-to-end-transaction-details.jpg)
+
+Navigate to the `Failures/Exceptions` blade - you can see a collection of exceptions:
+![](./media/petclinic-microservices-failures-exceptions.jpg)
+
+Click on an exception to see the end-to-end transaction and stacktrace in context:
+![](./media/end-to-end-transaction-details.jpg)
+
+Navigate to the `Metrics` blade - you can see metrics contributed by Spring Boot apps, 
+Spring Cloud modules, and dependencies. 
+The chart below shows `gateway-requests` (Spring Cloud Gateway), `hikaricp_connections`
+ (JDBC Connections) and `http_client_requests`.
+ 
+![](./media/petclinic-microservices-metrics.jpg)
+
+Spring Boot registers a lot number of core metrics: JVM, CPU, Tomcat, Logback... 
+The Spring Boot auto-configuration enables the instrumentation of requests handled by Spring MVC.
+All those three REST controllers `OwnerResource`, `PetResource` and `VisitResource` have been instrumented by the `@Timed` Micrometer annotation at class level.
+
+* `customers-service` application has the following custom metrics enabled:
+  * @Timed: `petclinic.owner`
+  * @Timed: `petclinic.pet`
+* `visits-service` application has the following custom metrics enabled:
+  * @Timed: `petclinic.visit`
+
+You can see these custom metrics in the `Metrics` blade:
+![](./media/petclinic-microservices-custom-metrics.jpg)
+
+Navigate to the `Live Metrics` blade - you can see live metrics on screen with low latencies < 1 second:
+![](./media/petclinic-microservices-live-metrics.jpg)
 
 ## Automate deployments using GitHub Actions
 
