@@ -51,6 +51,10 @@ Install the Azure Spring Cloud extension for the Azure CLI using the following c
 ```bash
     az extension add --name spring-cloud
 ```
+Note - `spring-cloud` CLI extension `2.1.0` or later is a pre-requisite to enable the
+latest Java in-process agent for Application Insights. If you already 
+have the CLI extension, you may need to upgrade to the latest using --
+`az extension update --name spring-cloud`.
 
 ## Clone and build the repo
 
