@@ -12,7 +12,23 @@ urlFragment: "spring-petclinic-microservices"
 
 Azure Spring Cloud enables you to easily run a Spring Boot based microservices application on Azure.
 
-This quickstart shows you how to deploy an existing Java Spring Cloud application to Azure. When you're finished, you can continue to manage the application via the Azure CLI or switch to using the Azure portal.
+This quickstart shows you how to deploy an existing Java Spring Cloud application to Azure. When 
+you're finished, you can continue to manage the application via the Azure CLI or switch to using the 
+Azure Portal.
+
+* [Deploy Spring Microservices using Azure Spring Cloud and MySQL](#deploy-spring-microservices-using-azure-spring-cloud-and-mysql)
+      * [What will you experience](#what-will-you-experience)
+      * [What you will need](#what-you-will-need)
+      * [Install the Azure CLI extension](#install-the-azure-cli-extension)
+      * [Clone and build the repo](#clone-and-build-the-repo)
+      * [CREATE Azure Spring Cloud service instance using Azure CLI](#provision-azure-spring-cloud-service-instance-using-azure-cli)
+      * [CREATE microservice applications](#create-microservice-applications)
+      * [Create MySQL Database](#create-mysql-database)
+      * [DEPLOY applications and set environment variables](#deploy-applications-and-set-environment-variables)
+      * [MONITOR microservice applications](#monitor-microservice-applications)
+      * [AUTOMATE deployments using GitHub Actions](#automate-deployments-using-github-actions)
+      * [Manage application secrets using Azure KeyVault](#manage-application-secrets-using-azure-keyvault)
+      * [Next Steps](#next-steps)
 
 ## What will you experience
 You will:
