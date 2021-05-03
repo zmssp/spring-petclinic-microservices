@@ -122,7 +122,7 @@ resource "azurerm_spring_cloud_service" "example" {
   network {
     app_subnet_id             = azurerm_subnet.app_subnet.id
     service_runtime_subnet_id = azurerm_subnet.service_subnet.id
-    cidr                      = ["10.4.0.0/16", "10.5.0.0/16", "10.3.0.1/16"]
+    cidr_ranges               = ["10.4.0.0/16", "10.5.0.0/16", "10.3.0.1/16"]
   }
 
   tags = {
