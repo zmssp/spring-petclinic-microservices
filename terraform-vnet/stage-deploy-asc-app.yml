@@ -1,13 +1,13 @@
 name: Stage-Deploy Resource
 
 variables:
-- group: azure-environment
+- group: azure-environment-terraform
+- name: DeploymentName
+  value: d$(Build.BuildId)
 
 parameters:
 - name: spring_cloud_name
   default: $(SPRING_CLOUD_NAME)
-- name: resource_group
-  default: $(RESOURCE_GROUP)
 - name: application_name
   default: $(application.name)
   
@@ -16,6 +16,11 @@ trigger: none
 pool:
   vmImage: 'ubuntu-latest'
 
+resources:
+  pipelines:
+  - pipeline: build_from_github
+    source: Build from GitHub
+    trigger: none
 
 stages: 
 - stage: deploy_staging
@@ -24,53 +29,41 @@ stages:
   - job: deploy_staging
     displayName: Staging Deployment
     steps:
-    - task: DownloadBuildArtifacts@0
-      inputs:
-        buildType: 'specific'
-        project: $(System.TeamProjectId)
-        pipeline: $(Build.TriggeredBy.DefinitionId)
-        buildVersionToDownload: 'latest'
-        downloadType: 'single'
-        downloadPath: '$(System.ArtifactsDirectory)'
-        artifactName: build
+    - download: build_from_github
+      artifact: build
 
-    - task: AzureCLI@2
-      name: deploy_to_staging
-      displayName: Staging Deployment
+    - task: AzureSpringCloud@0
+      continueOnError: true
       inputs:
         azureSubscription: '$(SERVICE_CONNECTION_NAME)'
-        scriptType: 'pscore'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          az extension add -n spring-cloud -y
+        Action: 'Delete Staging Deployment'
+        AppName: '${{parameters.application_name}}'
+        AzureSpringCloud: '${{parameters.spring_cloud_name}}'
+        
 
-
-          Write-Host "Removing inactive deployments..."
-          $inactiveDeployments =  az spring-cloud app deployment list  -s '${{parameters.spring_cloud_name}}' -g '${{parameters.resource_group}}' --app '${{parameters.application_name}}' | ConvertFrom-Json |  Where-Object { !$_.properties.active} | Select -Expand name
-          $inactiveDeployments | %{  az spring-cloud app deployment delete -s '${{parameters.spring_cloud_name}}' -g '${{parameters.resource_group}}' --app '${{parameters.application_name}}'  -n $_ --verbose }
-
-          $jarPath=(dir $(System.ArtifactsDirectory)/build/*${{parameters.application_name}}*.jar | select -Expand FullName)
-          echo 'Deploying ${jarPath}... as ${{parameters.application_name}}'
-          echo 'Creating deployment d$(Build.BuildId)...'
-
-          az spring-cloud app deployment create -s '${{parameters.spring_cloud_name}}' -g '${{parameters.resource_group}}' -n 'd$(Build.BuildId)' --app '${{parameters.application_name}}' --jar-path $jarPath --skip-clone-settings
-
+    - task: AzureSpringCloud@0
+      timeoutInMinutes: 20
+      inputs:
+        azureSubscription: '$(SERVICE_CONNECTION_NAME)'
+        Action: 'Deploy'
+        AzureSpringCloud: '${{parameters.spring_cloud_name}}'
+        AppName: '${{parameters.application_name}}'
+        UseStagingDeployment: false
+        DeploymentName: '$(DeploymentName)'
+        CreateNewDeployment: true
+        Package: '$(PIPELINE.WORKSPACE)/build_from_github/build/*${{parameters.application_name}}*.jar'
+    
 - stage: move_to_production
   displayName: Move to Production
   jobs:
   - job: move_to_production
     displayName: Move to Production
     steps:
-    - task: AzureCLI@2
-      name: move_to_production
-      displayName: Staging Deployment
+    - task: AzureSpringCloud@0
       inputs:
         azureSubscription: '$(SERVICE_CONNECTION_NAME)'
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          az extension add -n spring-cloud -y
-          echo "Currently active deployment: ${previouslyActiveDeployment}"
-          az spring-cloud app set-deployment --deployment 'd$(Build.BuildId)' --resource-group '${{parameters.resource_group}}' --service '${{parameters.spring_cloud_name}}' --name '${{parameters.application_name}}' --verbose
-          echo 'New active deployment: d$(Build.BuildId)'
-
+        Action: 'Set Production'
+        AzureSpringCloud: '${{parameters.spring_cloud_name}}'
+        AppName: '${{parameters.application_name}}'
+        UseStagingDeployment: false
+        DeploymentName: '$(DeploymentName)'
