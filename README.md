@@ -463,9 +463,9 @@ open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/actuat
 open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/actuator/env
 open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/actuator/configprops
 
-open https://${SPRING_CLOUD_SERVICE}-${CUSTOMERS_SERVICE}.azuremicroservices.io/api/customer/actuator
-open https://${SPRING_CLOUD_SERVICE}-${CUSTOMERS_SERVICE}.azuremicroservices.io/api/customer/actuator/env
-open https://${SPRING_CLOUD_SERVICE}-${CUSTOMERS_SERVICE}.azuremicroservices.io/api/customer/actuator/configprops
+open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/actuator
+open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/actuator/env
+open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/actuator/configprops
 ```
 
 #### Start monitoring Spring Boot apps and dependencies - in Application Insights
