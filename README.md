@@ -438,6 +438,36 @@ curl -X GET https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io
 curl -X GET https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/visit/owners/6/pets/8/visits
 ```
 
+#### Get the log stream for API Gateway and Customers Service
+
+Use the following command to get the latest 100 lines of app console logs from Customers Service. 
+```bash
+az spring-cloud app logs -n ${CUSTOMERS_SERVICE} --lines 100
+```
+By adding a `-f` parameter you can get real-time log streaming from the app. Try log streaming for the API Gateway app.
+```bash
+az spring-cloud app logs -n ${API_GATEWAY} -f
+```
+You can use `az spring-cloud app logs -h` to explore more parameters and log stream functionalities.
+
+#### Open Actuator endpoints for API Gateway and Customers Service apps
+
+Spring Boot includes a number of additional features to help you monitor and manage your application when you push it to production ([Spring Boot Actuator: Production-ready Features](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#actuator)). You can choose to manage and monitor your application by using HTTP endpoints or with JMX. Auditing, health, and metrics gathering can also be automatically applied to your application.
+
+Actuator endpoints let you monitor and interact with your application. By default, Spring Boot application exposes `health` and `info` endpoints to show arbitrary application info and health information. Apps in this project are pre-configured to expose all the Actuator endpoints.
+
+You can try them out by opening the following app actuator endpoints in a browser:
+
+```bash
+open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/actuator/
+open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/actuator/env
+open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/actuator/configprops
+
+open https://${SPRING_CLOUD_SERVICE}-${CUSTOMERS_SERVICE}.azuremicroservices.io/api/customer/actuator
+open https://${SPRING_CLOUD_SERVICE}-${CUSTOMERS_SERVICE}.azuremicroservices.io/api/customer/actuator/env
+open https://${SPRING_CLOUD_SERVICE}-${CUSTOMERS_SERVICE}.azuremicroservices.io/api/customer/actuator/configprops
+```
+
 #### Start monitoring Spring Boot apps and dependencies - in Application Insights
 
 Open the Application Insights created by Azure Spring Cloud and start monitoring 
