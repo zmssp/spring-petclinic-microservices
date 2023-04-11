@@ -42,7 +42,7 @@ In order to deploy a Java app to cloud, you need an Azure subscription. If you d
 In addition, you will need the following:
 
 | [Azure CLI version 2.44.0 or higher](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) 
-| [Java 8](https://adoptium.net/temurin/releases/?version=8) 
+| [Java 17](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-17) 
 | [Maven](https://maven.apache.org/download.cgi) 
 | [Git](https://git-scm.com/)
 |
