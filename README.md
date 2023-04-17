@@ -259,27 +259,22 @@ Create 5 apps.
     az spring app create --name ${API_GATEWAY} --instance-count 1 --assign-endpoint true \
         --memory 2Gi \
         --runtime-version Java_17 \
-        --jvm-options='-Xms2048m -Xmx2048m'
-    
-    az spring app create --name ${ADMIN_SERVER} --instance-count 1 --assign-endpoint true \
-        --memory 2Gi \
-        --runtime-version Java_17 \
-        --jvm-options='-Xms2048m -Xmx2048m'
-    
+        --jvm-options='-Xms1536m -Xmx1536m'
+        
     az spring app create --name ${CUSTOMERS_SERVICE} --instance-count 1 \
         --memory 2Gi \
         --runtime-version Java_17 \
-        --jvm-options='-Xms2048m -Xmx2048m'
+        --jvm-options='-Xms1536m -Xmx1536m'
     
     az spring app create --name ${VETS_SERVICE} --instance-count 1 \
         --memory 2Gi \
         --runtime-version Java_17 \
-        --jvm-options='-Xms2048m -Xmx2048m'
+        --jvm-options='-Xms1536m -Xmx1536m'
     
     az spring app create --name ${VISITS_SERVICE} --instance-count 1 \
         --memory 2Gi \
         --runtime-version Java_17 \
-        --jvm-options='-Xms2048m -Xmx2048m'
+        --jvm-options='-Xms1536m -Xmx1536m'
 ```
 
 ### Create MySQL Database
@@ -382,40 +377,28 @@ az spring app deploy \
         --resource-group ${RESOURCE_GROUP} \
         --service ${SPRING_CLOUD_SERVICE} \
         --name ${API_GATEWAY} \
-        --artifact-path ${API_GATEWAY_JAR} \
-        --jvm-options='-Xms2048m -Xmx2048m' \
-        --env SPRING_PROFILES_ACTIVE=passwordless 
-
-az spring app deploy \
-        --resource-group ${RESOURCE_GROUP} \
-        --service ${SPRING_CLOUD_SERVICE} \
-        --name ${ADMIN_SERVER} \
-        --artifact-path ${ADMIN_SERVER_JAR} \
-        --jvm-options='-Xms2048m -Xmx2048m' \
+        --artifact-path ${API_GATEWAY_JAR} \        
         --env SPRING_PROFILES_ACTIVE=passwordless 
 
 az spring app deploy \
         --resource-group ${RESOURCE_GROUP} \
         --service ${SPRING_CLOUD_SERVICE} \
         --name ${CUSTOMERS_SERVICE} \
-        --artifact-path ${CUSTOMERS_SERVICE_JAR} \
-        --jvm-options='-Xms2048m -Xmx2048m' \
+        --artifact-path ${CUSTOMERS_SERVICE_JAR} \      
         --env SPRING_PROFILES_ACTIVE=passwordless 
 
 az spring app deploy \
         --resource-group ${RESOURCE_GROUP} \
         --service ${SPRING_CLOUD_SERVICE} \
         --name ${VETS_SERVICE} \
-        --artifact-path ${VETS_SERVICE_JAR} \
-        --jvm-options='-Xms2048m -Xmx2048m' \
+        --artifact-path ${VETS_SERVICE_JAR} \      
         --env SPRING_PROFILES_ACTIVE=passwordless 
 
 az spring app deploy \
         --resource-group ${RESOURCE_GROUP} \
         --service ${SPRING_CLOUD_SERVICE} \
         --name ${VISITS_SERVICE} \
-        --artifact-path ${VISITS_SERVICE_JAR} \
-        --jvm-options='-Xms2048m -Xmx2048m' \
+        --artifact-path ${VISITS_SERVICE_JAR} \        
         --env SPRING_PROFILES_ACTIVE=passwordless 
 ```
 
@@ -697,16 +680,13 @@ Enable System Assigned Identities for applications and export identities to envi
 Configuration repo contains a profile for passwordless access to MySql. To activate it, we need to add the following environment variable `SPRING_PROFILES_ACTIVE=passwordless`
 
 ```bash
-    az spring app update --name ${CUSTOMERS_SERVICE} \
-        --jvm-options='-Xms2048m -Xmx2048m' \
+    az spring app update --name ${CUSTOMERS_SERVICE} \        
         --env SPRING_PROFILES_ACTIVE=passwordless
 
-    az spring app update --name ${VETS_SERVICE} \
-        --jvm-options='-Xms2048m -Xmx2048m' \
+    az spring app update --name ${VETS_SERVICE} \        
         --env SPRING_PROFILES_ACTIVE=passwordless
         
-    az spring app update --name ${VISITS_SERVICE} \
-        --jvm-options='-Xms2048m -Xmx2048m' \
+    az spring app update --name ${VISITS_SERVICE} \        
         --env SPRING_PROFILES_ACTIVE=passwordless
 ```
 
